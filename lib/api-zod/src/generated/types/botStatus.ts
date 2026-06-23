@@ -5,27 +5,6 @@
  * Minecraft Server Keepalive API
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
-}
-
-export interface ApiError {
-  error: string;
-}
-
-export interface BotConfig {
-  /** Minecraft server host (e.g. myserver.aternos.me) */
-  host: string;
-  /** Server port (default 25565) */
-  port?: number;
-  /** Bot username */
-  username: string;
-  /**
-     * Minecraft version (optional, auto-detect if null)
-     * @nullable
-     */
-  version?: string | null;
-}
 
 export interface BotStatus {
   connected: boolean;
@@ -47,10 +26,3 @@ export interface BotStatus {
   /** @nullable */
   lastError?: string | null;
 }
-
-export interface LogEntry {
-  timestamp: string;
-  level: string;
-  message: string;
-}
-

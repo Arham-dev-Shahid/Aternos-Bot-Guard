@@ -3,13 +3,15 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Minecraft Server Keepalive API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: bot
+    description: Minecraft bot operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,77 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /bot/status:
+    get:
+      operationId: getBotStatus
+      tags: [bot]
+      summary: Get bot status
+      description: Returns the current bot connection status and config
+      responses:
+        "200":
+          description: Bot status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BotStatus"
+
+  /bot/connect:
+    post:
+      operationId: connectBot
+      tags: [bot]
+      summary: Connect bot to server
+      description: Starts the Minecraft bot and connects it to the given server
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BotConfig"
+      responses:
+        "200":
+          description: Bot connected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BotStatus"
+        "400":
+          description: Invalid config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /bot/disconnect:
+    post:
+      operationId: disconnectBot
+      tags: [bot]
+      summary: Disconnect bot
+      description: Stops the Minecraft bot
+      responses:
+        "200":
+          description: Bot disconnected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BotStatus"
+
+  /bot/logs:
+    get:
+      operationId: getBotLogs
+      tags: [bot]
+      summary: Get recent bot logs
+      description: Returns recent log entries from the bot
+      responses:
+        "200":
+          description: Log entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LogEntry"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +107,70 @@ components:
       required:
         - status
 
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    BotConfig:
+      type: object
+      properties:
+        host:
+          type: string
+          description: Minecraft server host (e.g. myserver.aternos.me)
+        port:
+          type: integer
+          description: Server port (default 25565)
+        username:
+          type: string
+          description: Bot username
+        version:
+          type: ["string", "null"]
+          description: Minecraft version (optional, auto-detect if null)
+      required:
+        - host
+        - username
+
+    BotStatus:
+      type: object
+      properties:
+        connected:
+          type: boolean
+        connecting:
+          type: boolean
+        host:
+          type: ["string", "null"]
+        port:
+          type: ["integer", "null"]
+        username:
+          type: ["string", "null"]
+        version:
+          type: ["string", "null"]
+        reconnectCount:
+          type: integer
+        uptime:
+          type: ["integer", "null"]
+          description: Uptime in seconds since last connect
+        lastError:
+          type: ["string", "null"]
+      required:
+        - connected
+        - connecting
+        - reconnectCount
+
+    LogEntry:
+      type: object
+      properties:
+        timestamp:
+          type: string
+        level:
+          type: string
+        message:
+          type: string
+      required:
+        - timestamp
+        - level
+        - message

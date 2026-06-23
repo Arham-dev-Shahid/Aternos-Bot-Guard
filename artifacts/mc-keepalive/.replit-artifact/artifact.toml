@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "MC Server Keepalive"
+version = "1.0.0"
+id = "artifacts/mc-keepalive"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23566
+
+[services.development]
+run = "pnpm --filter @workspace/mc-keepalive run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mc-keepalive", "run", "build" ]
+publicDir = "artifacts/mc-keepalive/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23566"
+BASE_PATH = "/"
